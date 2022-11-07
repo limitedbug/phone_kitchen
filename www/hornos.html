@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <title>Testing</title>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+
+    </head>
+    <body>
+        <div class="title">
+            <h1 id="name">KM</h1>
+            <!-- <a id="start-scan" disabled>Escanear</a> -->
+            <a id="disconnectButton">Desconectar</a>
+        </div>  
+        <div id="mainPage">
+            <div id="status"></div>
+            <div id="devices">
+            </div>
+        </div>
+        <div id="detailPage">
+            
+            <div id="general-data" class="center-box shadow" style="background-color: #424242;">
+                <h2 class="center-box center-text">Información</h2>
+                <hr class="solid">
+                <div class="data">
+                    <div class="data-section">
+                        <div class="text-data"><b>Temperatura:</b></div>
+                        <div class="number-data" id="temperature">0</div>
+                    </div>
+                    <div class="data-section">
+                        <div class="text-data"><b>Humedad:</b></div>
+                        <div class="number-data" id="humidity">0</div>
+                    </div>
+                    <div class="data-section">
+                        <div class="text-data"><b>Humo:</b></div>
+                        <div class="number-data" id="smoke">0</div>
+                    </div>
+                    <div class="data-section">
+                        <div class="text-data"><b>Gas:</b></div>
+                        <div class="number-data" id="gas">0</div>
+                    </div>
+                </div>
+                <p id="datagetter">H</p>
+            </div>
+            <div class="actions center-box shadow" style="background-color: #424242;">
+                <h2 class="center-box center-text">Control</h2>
+                <hr class="solid">
+                <div class="action">
+                    <h3 class="title-action">Ventilación</h3>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="action">
+                    <h3 class="title-action">Ventanal</h3>
+                    <label class="switch">
+                        <input id="venta" type="checkbox" onchange="ventanal(this)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="action">
+                    <h3 class="title-action">Hornos</h3>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="action">
+                    <h3 class="title-action">Iluminación</h3>
+                    <label class="switch">
+                        <input type="checkbox" id="ilum" onchange="iluminacion(this);">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div id="resultDiv"></div>
+        </div>
+        <script>
+            document.getElementById('start-scan').addEventListener('click', () => {
+                for (let i = 0; i < 10; i++) {
+                    var button = document.createElement("button");
+                    button.style.width = "50%";
+                    button.style.padding = "10px";
+                    button.style.fontSize = "16px";
+                    button.style.margin = "5px";
+                    button.innerHTML = "name" + ": " + "address";
+
+                    button.addEventListener("click", function () {
+                        // connect(address);
+                    });
+
+                    document.getElementById("devices").appendChild(button)+'<br>';
+                }
+            })
+        </script>
+    </body>
+</html>

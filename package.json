@@ -1,0 +1,33 @@
+{
+  "name": "io.cordova.hellocordova",
+  "displayName": "KitchenMaster",
+  "version": "1.0.0",
+  "description": "A sample Apache Cordova application that responds to the deviceready event.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Roberto",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cordova-android": "^10.1.2",
+    "cordova-browser": "^6.0.0",
+    "cordova-mobile-app-template": "^1.2.0",
+    "cordova-plugin-badge": "^0.8.8",
+    "cordova-plugin-bluetooth-serial": "^0.4.7",
+    "cordova-plugin-device": "^2.1.0",
+    "cordova-plugin-local-notification": "github:rgarciadelongoria/cordova-plugin-local-notifications"
+  },
+  "cordova": {
+    "platforms": [
+      "android",
+      "browser"
+    ],
+    "plugins": {
+      "cordova-plugin-bluetooth-serial": {}
+    }
+  }
+}
