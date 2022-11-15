@@ -53,6 +53,7 @@ Stepper myStepper(stepsPerRevolution, PIN_MOTOR_PASOS_1, PIN_MOTOR_PASOS_2, PIN_
 SoftwareSerial BT(PIN_TXD,PIN_RXD);
 DHT dht(PIN_DHT_HUME, DHT11);
 
+
 //Simuladores
 #define PIN_BOTON 13 //luz
 #define PIN_POTENCIOMETRO A8 //Horno
@@ -123,7 +124,7 @@ void loop() {
 
 
   //Control de funcionamiento del boton para la simulacion de HORNO
-  valor_horno = analogRead(PIN_POTENCIOMETRO)
+  
   controlarHorno(valor_horno);
 
 
@@ -161,6 +162,14 @@ void loop() {
     }
   }
 
+  //Deteccion de humedad
+  float h = dht.readHumidity();
+  if(h > 30 && h <= 50){
+    sendAlert("¡Humedad!", "Se ha detectado una cantidad moderada de humedad dentro de la habitacion.");
+  }else if(h > 50){
+    sendAlert("¡Humedad!", "Se ha detectado una gran cantidad de humedad dentro de la habitacion.");
+    bandera_venta = 1;
+  }
 
   //Control Bluetooth
   if (BT.available()) {
@@ -186,7 +195,7 @@ void loop() {
         bandera_luz = 1;
         Serial.println("Se prendieron luces");
         break;
-      case 'k'://ventilacion disipador
+      case 'k'://apagado de ventilador
         bandera_disi = 0;
         bandera_extra = 0;
         Serial.println("Se apago el ventilador");
@@ -199,11 +208,22 @@ void loop() {
         activarExtractor();
         Serial.println("Se prendio el ventilador en modo extractor");
         break;
-      case 'h'://ventilacion extractor
-        
-        Serial.println("efe");
+      case 'h'://prender horno en amarillo
+        valor_horno = 30;
+        Serial.println("Se prendio el horno con llama baja");
         break;
-      
+      case 'w'://prender horno en rojo
+        valor_horno = 40;
+        Serial.println("Se prendio el horno con llama media");
+        break;
+      case 'z'://prender horno en azul
+        valor_horno = 50;
+        Serial.println("Se prendio el horno con llama alta");
+        break;
+      case 'Z'://apagar horno 
+        valor_horno = 0;
+        Serial.println("Se apago el horno ");
+        break;
       default:
         break;
    }
@@ -211,6 +231,15 @@ void loop() {
 }
 void controlarHorno(float valor_horno){
   if(valor_horno != 0){
+    if(valor_horno <= 30){
+      prenderFuegoAmarillo();
+    }else if(valor_horno >30 && valor_horno <=40){
+      prenderFuegoRojo();
+    }else if(valor_horno >40){
+      prenderFuegoAzul();
+    } 
+  }else if(analogRead(PIN_POTENCIOMETRO) != 0){
+    valor_horno = analogRead(PIN_POTENCIOMETRO);
     if(valor_horno <= 30){
       prenderFuegoAmarillo();
     }else if(valor_horno >30 && valor_horno <=40){

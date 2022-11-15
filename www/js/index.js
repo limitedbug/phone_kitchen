@@ -355,7 +355,69 @@ async function ventilacion(checkbox){
 function gettingError(array){
 
 }
-
+function hornos(checkbox){
+    var titulo;
+    if(checkbox.checked){
+        titulo = "Se prenderan";
+    }else{
+        titulo = "Se apagaran";
+    }
+    Swal.fire({
+        title: titulo,
+        icon: 'question',
+        input: 'range',
+        inputLabel: 'Your age',
+        inputAttributes: {
+          min: 0,
+          max: 100,
+          step: 10
+        },
+        inputValue: 25
+      }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire('Saved!', '', 'success')
+            if(checkbox.checked){
+                if(result.value > 0 && result.value <= 33){
+                    sendData('h');
+                }else if(result.value > 33 && result.value <= 66){
+                    sendData('w');
+                }else if(result.value > 66){
+                    sendData('z');
+                }else{
+                    sendData('Z');
+                }
+            }
+        } else if (result.isDismissed) {
+            if(checkbox.checked){
+                checkbox.checked = false;
+            }else{
+                checkbox.checked = true;
+            }
+        }
+      })
+    // Swal.fire({
+    //     title: titulo,
+    //     showCancelButton: true,
+    //     confirmButtonText: 'Si!',
+    //   }).then((result) => {
+    //     /* Read more about isConfirmed, isDenied below */
+    //     if (result.isConfirmed) {
+    //         Swal.fire('Saved!', '', 'success')
+    //         if(checkbox.checked){
+    //             sendData('J');
+    //         }else{
+    //             sendData('j');
+    //         }
+    //     } else if (result.isDismissed) {
+    //         if(checkbox.checked){
+    //             checkbox.checked = false;
+    //         }else{
+    //             checkbox.checked = true;
+    //         }
+    //     }
+    //   })   
+    
+}
 function generateAlert(array){
     bandera = false;
     let titulo = array[pos];
