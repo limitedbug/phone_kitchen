@@ -22,7 +22,6 @@
             </div>
         </div>
         <div id="detailPage">
-            
             <div id="general-data" class="center-box shadow" style="background-color: #424242;">
                 <h2 class="center-box center-text">Información</h2>
                 <hr class="solid">
@@ -78,25 +77,73 @@
                     </label>
                 </div>
             </div>
+            <div id="m-venti" class="modal">
+
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <p style="color: black;">ventilacion</p>
+
+                </div>
+
+            </div>
+            <div id="m-venta" class="modal">
+
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <p style="color: black;">ventanal</p>
+
+                </div>
+
+            </div>
+            <div id="m-horno" class="modal">
+
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <p style="color: black;">horno</p>
+
+                </div>
+
+            </div>
+            <div id="m-ilum" class="modal">
+
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <p style="color: black;">iluminacion</p>
+
+                </div>
+
+            </div>
             <div id="resultDiv"></div>
         </div>
+        <script src="js/sweetalert.js"></script>
+        <script src="js/index.js"></script>
+        
         <script>
-            document.getElementById('start-scan').addEventListener('click', () => {
-                for (let i = 0; i < 10; i++) {
-                    var button = document.createElement("button");
-                    button.style.width = "50%";
-                    button.style.padding = "10px";
-                    button.style.fontSize = "16px";
-                    button.style.margin = "5px";
-                    button.innerHTML = "name" + ": " + "address";
 
-                    button.addEventListener("click", function () {
-                        // connect(address);
-                    });
+            // Get the modal
+            var modal = document.getElementsByClassName("modal");
+            console.log(modal);
+            // Get the button that opens the modal
 
-                    document.getElementById("devices").appendChild(button)+'<br>';
+            // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close");
+
+
+            for(let i=0;i<span.length;i++){
+                span[i].onclick = function() {
+                    modals[i].style.display = "none";
                 }
-            })
+            }
+            // When the user clicks anywhere outside of the modal, close it
+            // window.onclick = function(event) {
+            // if (event.target == modal) {
+            //     modal.style.display = "none";
+            // }
+            // }
         </script>
     </body>
 </html>

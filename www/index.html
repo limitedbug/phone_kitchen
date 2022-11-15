@@ -45,7 +45,9 @@
                         <div class="number-data" id="gas">0</div>
                     </div>
                 </div>
-                <p id="datagetter">H</p>
+                <div class="popup" onclick="myFunction()" id="datagetter">H
+                    <span class="popuptext" id="myPopup">Checa la información</span>
+                  </div>
             </div>
             <div class="actions center-box shadow" style="background-color: #424242;">
                 <h2 class="center-box center-text">Control</h2>
@@ -53,7 +55,7 @@
                 <div class="action">
                     <h3 class="title-action">Ventilación</h3>
                     <label class="switch">
-                        <input type="checkbox">
+                        <input id="venti" type="checkbox" onchange="ventilacion(this)">
                         <span class="slider round"></span>
                     </label>
                 </div>
@@ -81,8 +83,14 @@
             </div>
             <div id="resultDiv"></div>
         </div>
-            
+        <script src="js/sweetalert.js"></script>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
+        <script>
+            function myFunction() {
+                var popup = document.getElementById("myPopup");
+                popup.classList.toggle("show");
+            }
+        </script>
     </body>
 </html>

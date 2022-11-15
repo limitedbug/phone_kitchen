@@ -135,8 +135,12 @@ function disconnectSuccess(){
     clearInterval(intervalo);
     document.getElementById('status').innerHTML = "Disconnected from device.";
 }
+const againProm = new Promise((resolve) => {
+    
+});
 function getData(data){
     let dataArray = data.split(',');
+    console.log(dataArray);
     switch (dataArray[0]) {
         case 'data':
             gettingGeneralData(dataArray);
@@ -182,55 +186,189 @@ function gettingGeneralData(dataArray){
     document.getElementById('temperature').innerHTML = temperatura;
     document.getElementById('smoke').innerHTML = humo;
     document.getElementById('gas').innerHTML = gas;
-    let venta = dataArray[6] == '1' ? true : false;
     let ilum = dataArray[5] == '1' ? true : false;
+    let venta = dataArray[6] == '1' ? true : false;
+    let disi = dataArray[9] == '1' ? true : false;
+    let extra = dataArray[10] == '1' ? true : false;
+    if(disi || extra){
+        document.getElementById('venti').checked = true;
+        // Poner si es extractor o disipador
+    }else if(!disi && !extra){
+        document.getElementById('venti').checked = false;
+    }
     document.getElementById('venta').checked = venta;
     document.getElementById('ilum').checked = ilum
 }
 
 function ventanal(checkbox){
-    if(!confirm('¿Estas Seguro?')){
-        if(checkbox.checked){
-            checkbox.checked = false;
-        }else{
-            checkbox.checked = true;
-        }
-        return;
-    }
+    var titulo;
     if(checkbox.checked){
-        sendData('V');
+        titulo = "Se prenderan";
     }else{
-        sendData('v');
+        titulo = "Se apagaran";
     }
+    Swal.fire({
+        title: titulo,
+        showCancelButton: true,
+        confirmButtonText: 'Si!',
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            Swal.fire('Saved!', '', 'success')
+            if(checkbox.checked){
+                sendData('V');
+            }else{
+                sendData('v');
+            }
+        } else if (result.isDismissed) {
+            if(checkbox.checked){
+                checkbox.checked = false;
+            }else{
+                checkbox.checked = true;
+            }
+        }
+      })  
     
 }
 
 function iluminacion(checkbox){
-    if(!confirm('¿Estas Seguro?')){
-        if(checkbox.checked){
-            checkbox.checked = false;
-        }else{
-            checkbox.checked = true;
-        }
-        return;
-    }
+    var titulo;
     if(checkbox.checked){
-        sendData('J');
+        titulo = "Se prenderan";
     }else{
-        sendData('j');
+        titulo = "Se apagaran";
     }
+    Swal.fire({
+        title: titulo,
+        showCancelButton: true,
+        confirmButtonText: 'Si!',
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            Swal.fire('Saved!', '', 'success')
+            if(checkbox.checked){
+                sendData('J');
+            }else{
+                sendData('j');
+            }
+        } else if (result.isDismissed) {
+            if(checkbox.checked){
+                checkbox.checked = false;
+            }else{
+                checkbox.checked = true;
+            }
+        }
+      })   
     
+}
+
+async function ventilacion(checkbox){
+    var titulo;
+    if(checkbox.checked){
+        titulo = "Se prenderan";
+        const inputOptions = new Promise((resolve) => {
+            setTimeout(() => {
+            resolve({
+                'K': 'Disipador',
+                'H': 'Extractor'
+            })
+            }, 1000)
+        })
+        
+        const { value: tipo } = await Swal.fire({
+            title: titulo,
+            input: 'radio',
+            inputOptions: inputOptions,
+            inputValidator: (value) => {
+            if (!value) {
+                return 'Necesitas escojer uno!'
+            }
+            }
+        })
+        
+        if (tipo) {
+            if(tipo == "K"){
+                Swal.fire({
+                    title: titulo,
+                    showCancelButton: true,
+                    confirmButtonText: 'Si!',
+                  }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        Swal.fire('Saved!', '', 'success')
+                        if(checkbox.checked){
+                            sendData('K');
+                        }
+                    } else if (result.isDismissed) {
+                        if(checkbox.checked){
+                            checkbox.checked = false;
+                        }else{
+                            checkbox.checked = true;
+                        }
+                    }
+                  })   
+            }else if(tipo == "H"){
+                Swal.fire({
+                    title: titulo,
+                    showCancelButton: true,
+                    confirmButtonText: 'Si!',
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Swal.fire('Saved!', '', 'success')
+                    if(checkbox.checked){
+                        sendData('H');
+                    }
+                } else if (result.isDismissed) {
+                    if(checkbox.checked){
+                        checkbox.checked = false;
+                    }else{
+                        checkbox.checked = true;
+                    }
+                }
+                })   
+            }
+        }
+    }else{
+        titulo = "Se apagara el ventilador";
+        Swal.fire({
+            title: titulo,
+            showCancelButton: true,
+            confirmButtonText: 'Si!',
+        }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            Swal.fire('Saved!', '', 'success')
+            if(!checkbox.checked){
+                sendData('k');
+            }
+        } else if (result.isDismissed) {
+            if(checkbox.checked){
+                checkbox.checked = false;
+            }else{
+                checkbox.checked = true;
+            }
+        }
+        })  
+    }
 }
 function gettingError(array){
 
 }
+
 function generateAlert(array){
+    bandera = false;
     let titulo = array[pos];
     let texto = array[pos];
-    cordova.plugins.notification.local.schedule({
-        title: 'Advertencia',
-        text: 'Se ha detectado mucho humo dentro del edificio',
-        foreground: true,
-        vibrate: true
-    });
+    
+    setTimeout(function(){
+        bandera = true;
+    }, 5000);
+    if(bandera){
+        
+    }
+}
+
+function generatePop(texto){
+    Swal.fire(texto)
 }
