@@ -29,41 +29,42 @@ let pause = false;
 document.addEventListener('deviceready', onDeviceReady, false);
 document.addEventListener('pause', function(){
     pause = true;
-    cordova.plugins.notification.local.schedule({
-        title: 'Pause',
-        text: 'Se ha detectado mucho humo dentro del edificio',
-        foreground: true,
-        vibrate: true
-    });
+    
 }, false);
+
 document.addEventListener('resume', function(){
     pause = false;
 }, false);
 
-// navigator.notification.alert(
-//     'La aplicación inicio correctamente.',  // message
-//     function callback(){
-
-//     },         // callback
-//     'Kitchen Master',            // title
-//     'Ok!'                  // buttonName
-// );
 let intervalo;
-let intevalo2;
+let intervalo2;
+let intervalo3;
 var foundDevices = [];
 function onDeviceReady(){
     showMainPage();
-    cordova.plugins.notification.local.schedule({
-        title: 'Advertencia',
-        text: 'Se ha detectado mucho humo dentro del edificio',
-        foreground: true,
-        vibrate: true
-    });
-    intevalo2 = setInterval(() => {
+    bluetoothSerial.isEnabled(
+        function () {
+            document.getElementById("start-scan").disabled = false;
+            setStatus("Bluetooth activo.");
+            document.getElementById('start-scan').addEventListener('click', function(){
+                document.getElementById("devices").innerHTML = "";
+                startScan();
+            })
+        },
+        function () {
+            document.getElementById("start-scan").disabled = true;
+            setStatus("Porfavor activa el Bluetooth.");
+        }
+    );
+    intervalo2 = setInterval(() => {
         bluetoothSerial.isEnabled(
             function () {
                 document.getElementById("start-scan").disabled = false;
                 setStatus("Bluetooth activo.");
+                document.getElementById('start-scan').addEventListener('click', function(){
+                    document.getElementById("devices").innerHTML = "";
+                    startScan();
+                })
             },
             function () {
                 document.getElementById("start-scan").disabled = true;
@@ -71,13 +72,11 @@ function onDeviceReady(){
             }
         );
     }, 2000);
+    
 }
-document.getElementById('start-scan').addEventListener('click', function(){
-    document.getElementById("devices").innerHTML = "";
-    startScan();
-})
+
 function startScan(){
-    clearInterval(intevalo2); 
+    clearInterval(intervalo2); 
     bluetoothSerial.list(createDeviceList, handleError);
 }
 function createDeviceList(devices){
@@ -126,6 +125,11 @@ function connectSuccess() {
     intervalo = setInterval(() => {
         sendData('x');
     }, 5000);
+    intervalo3 = setInterval(() => {
+        bluetoothSerial.isConnected(function () {
+            
+        }, disconnectSuccess);
+    }, 5000);
     document.getElementById('disconnectButton').addEventListener('click', function(){
         bluetoothSerial.disconnect(disconnectSuccess, handleError);
     });
@@ -133,12 +137,11 @@ function connectSuccess() {
 function disconnectSuccess(){
     showMainPage();
     clearInterval(intervalo);
+    clearInterval(intervalo3);
     document.getElementById('status').innerHTML = "Disconnected from device.";
 }
-const againProm = new Promise((resolve) => {
-    
-});
-function getData(data){
+
+async function getData(data){
     let dataArray = data.split(',');
     console.log(dataArray);
     switch (dataArray[0]) {
@@ -149,7 +152,9 @@ function getData(data){
             gettingError(dataArray);
             break;
         case 'alert':
-            generateAlert(dataArray);
+            if(!cooldown_activo){
+                generateAlert(dataArray);
+            }
             break;
         default:
             break;
@@ -188,13 +193,20 @@ function gettingGeneralData(dataArray){
     document.getElementById('gas').innerHTML = gas;
     let ilum = dataArray[5] == '1' ? true : false;
     let venta = dataArray[6] == '1' ? true : false;
-    let disi = dataArray[9] == '1' ? true : false;
-    let extra = dataArray[10] == '1' ? true : false;
-    if(disi || extra){
+    let horno = parseInt(dataArray[7]) < 5 ? false : parseInt(dataArray[7]);
+    let disi = dataArray[8] == '1' ? true : false;
+    let extra = dataArray[9] == '1' ? true : false;
+    if(disi == true || extra == true){
         document.getElementById('venti').checked = true;
         // Poner si es extractor o disipador
-    }else if(!disi && !extra){
+    }else {
         document.getElementById('venti').checked = false;
+    }
+    if(!horno){
+        document.getElementById('horno').checked = false;
+    }else{
+        document.getElementById('horno').checked = true;
+        //poner a que temperatura
     }
     document.getElementById('venta').checked = venta;
     document.getElementById('ilum').checked = ilum
@@ -352,40 +364,50 @@ async function ventilacion(checkbox){
         })  
     }
 }
-function gettingError(array){
-
-}
 function hornos(checkbox){
     var titulo;
+    var mensaje;
     if(checkbox.checked){
         titulo = "Se prenderan";
+        mensaje = Swal.fire({
+            title: titulo,
+            icon: 'question',
+            input: 'range',
+            inputLabel: 'Intensidad de llama',
+            inputAttributes: {
+              min: 0,
+              max: 100,
+              step: 25
+            },
+            inputValue: 25
+          });
     }else{
         titulo = "Se apagaran";
+        mensaje = Swal.fire({
+            title: titulo,
+            icon: 'question',
+            input: 'range',
+            inputLabel: 'Intensidad de llama',
+            inputAttributes: {
+              min: 0,
+              max: 0
+            },
+            inputValue: 0
+          });
     }
-    Swal.fire({
-        title: titulo,
-        icon: 'question',
-        input: 'range',
-        inputLabel: 'Your age',
-        inputAttributes: {
-          min: 0,
-          max: 100,
-          step: 10
-        },
-        inputValue: 25
-      }).then((result) => {
+    mensaje.then((result) => {
         if (result.isConfirmed) {
             Swal.fire('Saved!', '', 'success')
             if(checkbox.checked){
                 if(result.value > 0 && result.value <= 33){
-                    sendData('h');
+                    sendData('h');//amarillo
                 }else if(result.value > 33 && result.value <= 66){
-                    sendData('w');
+                    sendData('w');//rojo
                 }else if(result.value > 66){
-                    sendData('z');
-                }else{
-                    sendData('Z');
+                    sendData('z');//azul
                 }
+            }else{
+                sendData('Z');//apagar
             }
         } else if (result.isDismissed) {
             if(checkbox.checked){
@@ -418,19 +440,31 @@ function hornos(checkbox){
     //   })   
     
 }
+var contador = 0;
 function generateAlert(array){
-    bandera = false;
-    let titulo = array[pos];
-    let texto = array[pos];
-    
-    setTimeout(function(){
-        bandera = true;
-    }, 5000);
-    if(bandera){
-        
+    let titulo = array[1] || "efe";
+    let texto = array[2] || "efe";
+    contador +=1;
+    document.getElementById('datagetter').innerHTML += contador;
+    cooldown_activo = true;
+    setTimeout(() => {
+        console.log("efe");
+        cooldown_activo = false;
+    }, 6000);
+    // alert("hola");
+    if(pause){
+        cordova.plugins.notification.local.schedule({
+            title: titulo,
+            text: texto,
+            foreground: true,
+            vibrate: true
+        });
+    }else{
+        Swal.fire({
+            icon: 'warning',
+            title: titulo,
+            text: texto
+          })
     }
-}
-
-function generatePop(texto){
-    Swal.fire(texto)
+    
 }
